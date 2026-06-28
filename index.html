@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First 30-Day Operating System Generator | VentureOS AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --surface:#F5F6F8;--card:#FFFFFF;--ink:#1A2230;--ink-light:#4B566B;--ink-faint:#8690A0;
+  --accent:#2A4D8F;--accent-light:#E6ECF6;--gold:#8A6A12;--gold-light:#F6F0DD;
+  --border:#D9DDE4;--border-strong:#BAC0CB;--radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+.topbar{background:var(--ink);color:#fff;padding:10px 26px;font-size:11.5px;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center;}
+.topbar a{color:#fff;text-decoration:none;opacity:.78;}
+.topbar .tb-right{display:flex;align-items:center;gap:16px;}
+.topbar button{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:'Inter',sans-serif;}
+.topbar button:hover{border-color:rgba(255,255,255,.6);}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:42px 26px 34px;}
+.header-inner{max-width:1080px;margin:0 auto;}
+.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.eyebrow::before{content:'';width:18px;height:1.5px;background:var(--accent);}
+.stage-chip{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--accent-light);color:var(--accent);padding:3px 9px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+h1{font-family:'Fraunces',serif;font-size:clamp(26px,3.8vw,40px);font-weight:600;line-height:1.14;max-width:700px;margin-bottom:12px;}
+h1 em{font-style:italic;color:var(--accent);}
+.header p{font-size:15px;color:var(--ink-light);max-width:540px;line-height:1.6;}
+.main{max-width:1080px;margin:0 auto;padding:32px 26px 80px;display:grid;grid-template-columns:360px 1fr;gap:26px;}
+@media(max-width:840px){.main{grid-template-columns:1fr;}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.panel h2{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:3px;}
+.panel .sub{font-size:12.5px;color:var(--ink-faint);margin-bottom:20px;}
+label{display:block;font-size:11px;font-weight:600;color:var(--ink-light);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 6px;}
+label:first-of-type{margin-top:0;}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:6px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink);background:#fff;}
+textarea{min-height:70px;resize:vertical;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}
+.btn{font-family:'Inter',sans-serif;font-weight:600;font-size:14px;padding:12px 20px;border-radius:6px;border:none;cursor:pointer;width:100%;margin-top:24px;background:var(--accent);color:#fff;}
+.btn:hover{background:#213e73;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.results{min-height:300px;}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:70px 24px;color:var(--ink-faint);min-height:400px;}
+.empty .icon{font-size:30px;margin-bottom:14px;opacity:.5;}
+.empty p{font-size:14px;max-width:330px;}
+.output-doc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px;font-size:14px;line-height:1.7;color:var(--ink);white-space:pre-wrap;}
+.output-actions{display:flex;gap:10px;margin-top:18px;}
+.copy-btn{background:var(--accent-light);color:var(--accent);border:none;font-size:13px;font-weight:600;padding:9px 16px;border-radius:6px;cursor:pointer;}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--accent-light);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 24px;gap:14px;color:var(--ink-light);min-height:400px;text-align:center;}
+.modal-overlay{position:fixed;inset:0;background:rgba(26,34,48,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:60;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--card);border-radius:12px;max-width:520px;width:100%;padding:30px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.modal h3{font-family:'Fraunces',serif;font-size:22px;margin-bottom:8px;}
+.modal>p{font-size:13.5px;color:var(--ink-light);line-height:1.6;margin-bottom:16px;}
+.tier{border:1px solid var(--border-strong);border-radius:8px;padding:16px;margin-bottom:12px;}
+.tier.active-tier{border-color:var(--accent);background:var(--accent-light);}
+.tier-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.tier-name{font-weight:700;font-size:14px;}
+.tier-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:4px;background:var(--accent);color:#fff;}
+.tier-badge.soon{background:var(--gold-light);color:var(--gold);}
+.tier-desc{font-size:12.5px;color:var(--ink-light);line-height:1.5;}
+.key-input-row{margin-top:10px;}
+.key-help{font-size:11.5px;color:var(--ink-faint);margin-top:6px;line-height:1.5;}
+.key-help a{color:var(--accent);}
+.modal-btn{background:var(--accent);color:#fff;border:none;font-weight:600;font-size:14px;padding:11px 18px;border-radius:6px;cursor:pointer;width:100%;margin-top:8px;}
+.modal-btn.ghost{background:none;border:1px solid var(--border-strong);color:var(--ink-light);margin-top:10px;}
+.key-status{font-size:12px;margin-top:10px;padding:8px 12px;border-radius:6px;}
+.key-status.ok{background:var(--accent-light);color:var(--accent);}
+.key-status.none{background:var(--gold-light);color:var(--gold);}
+footer{border-top:1px solid var(--border);padding:26px;text-align:center;font-size:11.5px;color:var(--ink-faint);line-height:1.9;}
+@media(max-width:600px){.header{padding:28px 18px;}.main{padding:22px 18px 60px;}.panel{padding:18px;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span>VentureOS AI · Live AI Agent · First 30-Day Operating System Generator</span>
+  <div class="tb-right"><button id="keyBtn">⚙ API Key &amp; Access</button><a href="https://ventureosai.com" target="_blank">ventureosai.com →</a></div>
+</div>
+<div class="header"><div class="header-inner">
+<div class="eyebrow">For new founders<span class="stage-chip">Operate</span></div>
+<h1>You launched a business. Here’s the <em>operating system</em> to run it from day one.</h1>
+<p>A live AI agent that turns what you sell into your complete first-30-day operating system: weekly rhythm, core workflows, customer-handling process, and money tracking. Free with your own Claude API key.</p>
+</div></div>
+<div class="main">
+<div class="panel">
+<h2>Your business</h2>
+<div class="sub">Three fields. The agent writes your operating system live.</div>
+<label>Business type</label>
+<select id="bizType"><option value="Physical product / goods">Physical product / goods</option><option value="Service business">Service business</option><option value="Digital product / software">Digital product / software</option><option value="Marketplace / platform">Marketplace / platform</option><option value="Food / hospitality">Food / hospitality</option></select>
+<label>What you sell (one line)</label>
+<input type="text" id="whatSell" placeholder="e.g. Handmade leather bags sold online">
+<label>Who runs it right now</label>
+<select id="who"><option value="Just me">Just me</option><option value="Me plus 1-2 people">Me + 1–2 people</option><option value="A small team of 3 or more">A small team (3+)</option></select>
+<button class="btn" id="genBtn">Generate operating system</button>
+</div>
+<div class="panel results">
+<div id="results"><div class="empty"><div class="icon">⬡</div><p>Tell us what you sell and the live agent will generate your complete first-30-day operating system.</p></div></div>
+</div>
+</div>
+<div class="modal-overlay" id="keyModal">
+  <div class="modal">
+    <h3>API Key &amp; Access</h3>
+    <p>This is a live AI agent. Choose how you'd like to power it:</p>
+    <div class="tier active-tier">
+      <div class="tier-head"><span class="tier-name">Free — use your own Claude API key</span><span class="tier-badge">Active</span></div>
+      <div class="tier-desc">Bring your own Claude API key. It's stored only in your browser and sent directly to Anthropic — never to us. This is the free way to use the agent.</div>
+      <div class="key-input-row">
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-...">
+        <div class="key-help">No key yet? Get one free at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> → API Keys. Your key stays in this browser only.</div>
+        <div id="keyStatus"></div>
+        <button class="modal-btn" id="saveKeyBtn">Save key &amp; activate</button>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="tier-head"><span class="tier-name">Subscription</span><span class="tier-badge soon">Coming soon</span></div>
+      <div class="tier-desc">Prefer not to use your own key? A monthly/yearly subscription where we power the agent for you. Not yet available — check back soon.</div>
+    </div>
+    <div class="tier">
+      <div class="tier-head"><span class="tier-name">One-time access</span><span class="tier-badge soon">Coming soon</span></div>
+      <div class="tier-desc">A single one-time payment for agent access, powered by us. Not yet available — check back soon.</div>
+    </div>
+    <button class="modal-btn ghost" id="closeModalBtn">Close</button>
+  </div>
+</div>
+<footer><strong>VentureOS AI</strong> · Live AI Agent · First 30-Day Operating System Generator · ventureosai.com<br>Mohammad Bukkar | Economic Systems Architect &amp; Founder — Sceamdo · VentureOS AI · Bukkar Ltd.</footer>
+<script>
+const MODEL='claude-sonnet-4-6';
+const LS_KEY='vosai_claude_api_key';
+function getKey(){return localStorage.getItem(LS_KEY)||'';}
+function renderKeyStatus(){
+  const el=document.getElementById('keyStatus');
+  if(getKey()){el.className='key-status ok';el.textContent='✓ Key saved in this browser. The agent is ready.';document.getElementById('apiKeyInput').value=getKey();}
+  else{el.className='key-status none';el.textContent='No key saved yet. Add one above to use the free tier.';}
+}
+document.getElementById('keyBtn').addEventListener('click',()=>{document.getElementById('keyModal').classList.add('show');renderKeyStatus();});
+document.getElementById('closeModalBtn').addEventListener('click',()=>document.getElementById('keyModal').classList.remove('show'));
+document.getElementById('saveKeyBtn').addEventListener('click',()=>{
+  const v=document.getElementById('apiKeyInput').value.trim();
+  if(!v){alert('Paste your Claude API key first.');return;}
+  localStorage.setItem(LS_KEY,v);renderKeyStatus();
+  setTimeout(()=>document.getElementById('keyModal').classList.remove('show'),700);
+});
+function buildPrompt(d){
+  return `You are an operations specialist for new small businesses. Produce a complete, ready-to-use FIRST 30-DAY OPERATING SYSTEM for the following business — the actual system to run it day to day, not advice.
+
+Business type: ${d.bizType}
+What they sell: ${d.whatSell}
+Who runs it: ${d.who}
+
+Produce the operating system with these clearly labelled sections:
+1. WEEKLY OPERATING RHYTHM — a fixed Monday-to-Sunday cycle of what to focus on each day to keep this specific business running.
+2. CORE WORKFLOW — the exact step-by-step sequence for handling every sale/order/job from start to finish, tailored to this business type.
+3. CUSTOMER-HANDLING PROCESS — how to handle first response, updates during delivery, after-delivery follow-up, and what to do when something goes wrong.
+4. MONEY IN / MONEY OUT TRACKING — the simple weekly tracking structure (what to record) that serves as their whole financial system for the first 30 days.
+
+Be concrete and specific to a "${d.whatSell}" business run by ${d.who}. Write it as a finished operating document they can start using today.`;
+}
+async function callClaude(prompt){
+  const key=getKey();
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:MODEL,max_tokens:2000,messages:[{role:'user',content:prompt}]})
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||('Request failed ('+res.status+')'));}
+  const data=await res.json();
+  return data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+}
+document.getElementById('genBtn').addEventListener('click',async()=>{
+  const d={bizType:document.getElementById('bizType').value,whatSell:val('whatSell'),who:document.getElementById('who').value};
+  if(!d.whatSell){alert('Tell us what you sell.');return;}
+  if(!getKey()){document.getElementById('keyModal').classList.add('show');renderKeyStatus();return;}
+  const results=document.getElementById('results');
+  results.innerHTML='<div class="loading-wrap"><div class="spinner"></div><div>The agent is building your operating system…</div></div>';
+  document.getElementById('genBtn').disabled=true;
+  try{
+    const out=await callClaude(buildPrompt(d));
+    window._packOut=out;
+    results.innerHTML='<div class="output-doc" id="docOut"></div><div class="output-actions"><button class="copy-btn" onclick="copyPack()">Copy pack</button></div>';
+    document.getElementById('docOut').textContent=out;
+  }catch(err){
+    results.innerHTML='<div class="empty"><div class="icon">⚠</div><p>'+err.message+'<br><br>If this is a key problem, click "API Key &amp; Access" above to check your key.</p></div>';
+  }finally{document.getElementById('genBtn').disabled=false;}
+});
+function copyPack(){navigator.clipboard.writeText(window._packOut||'').then(()=>alert('Pack copied to clipboard.'));}
+function val(id){return document.getElementById(id).value.trim();}
+</script>
+</body>
+</html>
